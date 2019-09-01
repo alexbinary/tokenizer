@@ -20,7 +20,7 @@ final class TokenizerTests: XCTestCase {
     
     func test_tokenizer() {
         
-        let inputString = "CREATE TABLE COLORS(NAME TEXT, RGB TEXT);"
+        let inputString = "CREATE TABLE COLORS(NAME TEXT,RGB TEXT);"
         
         let staticKnownTokens = [
             Token(name: "CREATE", regex: "CREATE"),
@@ -39,8 +39,22 @@ final class TokenizerTests: XCTestCase {
         let tokenizer = Tokenizer(staticKnownTokens: staticKnownTokens, dynamicKnownTokens: dynamicKnownTokens)
         let tokens = try! tokenizer.tokenize(inputString)
         
-        XCTAssertEqual(tokens.map { $0.name }, [
-            "CREATE", "WHITESPACE", "TABLE", "WHITESPACE", "IDENTIFIER", "OPENPAREN", "IDENTIFIER", "WHITESPACE", "TYPETEXT", "COMMA", "WHITESPACE", "IDENTIFIER", "WHITESPACE", "TYPETEXT", "CLOSEPAREN", "SEMICOLON"
+        XCTAssertEqual(tokens, [
+            TokenMatch(tokenName: "CREATE", value: "CREATE"),
+            TokenMatch(tokenName: "WHITESPACE", value: " "),
+            TokenMatch(tokenName: "TABLE", value: "TABLE"),
+            TokenMatch(tokenName: "WHITESPACE", value: " "),
+            TokenMatch(tokenName: "IDENTIFIER", value: "COLORS"),
+            TokenMatch(tokenName: "OPENPAREN", value: "("),
+            TokenMatch(tokenName: "IDENTIFIER", value: "NAME"),
+            TokenMatch(tokenName: "WHITESPACE", value: " "),
+            TokenMatch(tokenName: "TYPETEXT", value: "TEXT"),
+            TokenMatch(tokenName: "COMMA", value: ","),
+            TokenMatch(tokenName: "IDENTIFIER", value: "RGB"),
+            TokenMatch(tokenName: "WHITESPACE", value: " "),
+            TokenMatch(tokenName: "TYPETEXT", value: "TEXT"),
+            TokenMatch(tokenName: "CLOSEPAREN", value: ")"),
+            TokenMatch(tokenName: "SEMICOLON", value: ";"),
         ])
     }
 

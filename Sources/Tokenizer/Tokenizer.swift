@@ -7,28 +7,28 @@ struct Tokenizer {
     let staticKnownTokens: [Token]
     let dynamicKnownTokens: [Token]
     
-    func tokenize(_ inputString: String) throws -> [Token] {
+    func tokenize(_ inputString: String) throws -> [TokenMatch] {
         
         var knownTokens: [Token] = []
         knownTokens.append(contentsOf: staticKnownTokens)
         knownTokens.append(contentsOf: dynamicKnownTokens)
         
-        var readTokens: [Token] = []
+        var readTokens: [TokenMatch] = []
         
         var currentInputString = inputString
         
         while !currentInputString.isEmpty {
         
-            var tokenRange: Range<String.Index>? = nil
+            var tokenMatch: Substring? = nil
             
             let matchedToken = knownTokens.first { token in
                 
                 let regex = "^\(token.regex)"
                 
-                let matchedRanges = currentInputString.matchedRanges(for: regex)
-                if matchedRanges.count > 0 {
+                let matches = currentInputString.matchedRanges(for: regex)
+                if matches.count > 0 {
                 
-                    tokenRange = matchedRanges.first
+                    tokenMatch = matches.first
                     return true
                 }
                 
@@ -37,7 +37,7 @@ struct Tokenizer {
             
             if let t = matchedToken {
                 
-                readTokens.append(t)
+                readTokens.append(TokenMatch(tokenName: t.name, value: String(tokenMatch!)))
             
             } else {
             
@@ -46,7 +46,7 @@ struct Tokenizer {
                 throw "unexpected input --\(currentInputString)--"
             }
             
-            currentInputString.removeSubrange(tokenRange!)
+            currentInputString.removeSubrange(tokenMatch!.startIndex..<tokenMatch!.endIndex)
         }
         
         return readTokens
@@ -54,10 +54,17 @@ struct Tokenizer {
 }
 
 
-struct Token: Equatable {
+struct Token {
     
     let name: String
     let regex: String
+}
+
+
+struct TokenMatch: Equatable {
+    
+    let tokenName: String
+    let value: String
 }
 
 

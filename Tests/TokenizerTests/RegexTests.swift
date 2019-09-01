@@ -9,9 +9,9 @@ final class RegexTests: XCTestCase {
         let inputString = "CREATE TABLE"
         let regex = "CREATOR"
         
-        let ranges = inputString.matchedRanges(for: regex)
+        let matches = inputString.matchedRanges(for: regex)
         
-        XCTAssertEqual(ranges.count, 0)
+        XCTAssertEqual(matches.count, 0)
     }
     
     func test_Regex_matchedRanges_oneMatch_beginning() {
@@ -19,11 +19,12 @@ final class RegexTests: XCTestCase {
         let inputString = "CREATE TABLE"
         let regex = "CREATE"
         
-        let ranges = inputString.matchedRanges(for: regex)
+        let matches = inputString.matchedRanges(for: regex)
         
-        XCTAssertEqual(ranges.count, 1)
-        XCTAssertEqual(ranges[0].lowerBound, inputString.startIndex)
-        XCTAssertEqual(ranges[0].upperBound, inputString.index(inputString.startIndex, offsetBy: 6))
+        XCTAssertEqual(matches.count, 1)
+        XCTAssertEqual(matches[0], "CREATE")
+        XCTAssertEqual(matches[0].startIndex, inputString.startIndex)
+        XCTAssertEqual(matches[0].endIndex, inputString.index(inputString.startIndex, offsetBy: 6))
     }
     
     func test_Regex_matchedRanges_oneMatch_middle() {
@@ -31,11 +32,12 @@ final class RegexTests: XCTestCase {
         let inputString = "CREATE TABLE"
         let regex = "TABLE"
         
-        let ranges = inputString.matchedRanges(for: regex)
+        let matches = inputString.matchedRanges(for: regex)
         
-        XCTAssertEqual(ranges.count, 1)
-        XCTAssertEqual(ranges[0].lowerBound, inputString.index(inputString.startIndex, offsetBy: 7))
-        XCTAssertEqual(ranges[0].upperBound, inputString.index(inputString.startIndex, offsetBy: 12))
+        XCTAssertEqual(matches.count, 1)
+        XCTAssertEqual(matches[0], "TABLE")
+        XCTAssertEqual(matches[0].startIndex, inputString.index(inputString.startIndex, offsetBy: 7))
+        XCTAssertEqual(matches[0].endIndex, inputString.index(inputString.startIndex, offsetBy: 12))
     }
 
     static var allTests = [

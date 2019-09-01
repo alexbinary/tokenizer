@@ -5,7 +5,7 @@ import Foundation
 extension String {
     
     
-    func matchedRanges(for regex: String) -> [Range<String.Index>] {
+    func matchedRanges(for regex: String) -> [Substring] {
 
         let inputString = self
         
@@ -15,7 +15,10 @@ extension String {
             let results = regex.matches(in: inputString,
                                         range: NSRange(inputString.startIndex..., in: inputString))
             
-            return results.map { Range($0.range, in: inputString)! }
+            return results.map {
+                let range = Range($0.range, in: inputString)!
+                return inputString[range]
+            }
             
         } catch let error {
             
