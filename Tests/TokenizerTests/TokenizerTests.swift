@@ -4,43 +4,48 @@ import Foundation
 
 final class TokenizerTests: XCTestCase {
     
-    func test_Regex_matchedRanges_zeroMatch() {
+    func test_tokenizer_badinput() {
         
-        let inputString = "CREATE TABLE"
-        let regex = "CREATOR"
+        let inputString = "CREATETABLEFOO"
         
-        let ranges = inputString.matchedRanges(for: regex)
+        let staticKnownTokens = [
+            Token(name: "CREATE", regex: "CREATE"),
+            Token(name: "TABLE", regex: "TABLE"),
+        ]
         
-        XCTAssertEqual(ranges.count, 0)
+        let tokenizer = Tokenizer(staticKnownTokens: staticKnownTokens, dynamicKnownTokens: [])
+        
+        XCTAssertThrowsError(try tokenizer.tokenize(inputString))
     }
     
-    func test_Regex_matchedRanges_oneMatch_beginning() {
+    func test_tokenizer() {
         
-        let inputString = "CREATE TABLE"
-        let regex = "CREATE"
+        let inputString = "CREATE TABLE COLORS(NAME TEXT, RGB TEXT);"
         
-        let ranges = inputString.matchedRanges(for: regex)
+        let staticKnownTokens = [
+            Token(name: "CREATE", regex: "CREATE"),
+            Token(name: "WHITESPACE", regex: "\\s+"),
+            Token(name: "TABLE", regex: "TABLE"),
+            Token(name: "SEMICOLON", regex: ";"),
+            Token(name: "TYPETEXT", regex: "TEXT"),
+            Token(name: "OPENPAREN", regex: "\\("),
+            Token(name: "CLOSEPAREN", regex: "\\)"),
+            Token(name: "COMMA", regex: ","),
+        ]
+        let dynamicKnownTokens = [
+            Token(name: "IDENTIFIER", regex: "[A-Z]+"),
+        ]
         
-        XCTAssertEqual(ranges.count, 1)
-        XCTAssertEqual(ranges[0].lowerBound, inputString.startIndex)
-        XCTAssertEqual(ranges[0].upperBound, inputString.index(inputString.startIndex, offsetBy: 6))
-    }
-    
-    func test_Regex_matchedRanges_oneMatch_middle() {
+        let tokenizer = Tokenizer(staticKnownTokens: staticKnownTokens, dynamicKnownTokens: dynamicKnownTokens)
+        let tokens = try! tokenizer.tokenize(inputString)
         
-        let inputString = "CREATE TABLE"
-        let regex = "TABLE"
-        
-        let ranges = inputString.matchedRanges(for: regex)
-        
-        XCTAssertEqual(ranges.count, 1)
-        XCTAssertEqual(ranges[0].lowerBound, inputString.index(inputString.startIndex, offsetBy: 7))
-        XCTAssertEqual(ranges[0].upperBound, inputString.index(inputString.startIndex, offsetBy: 12))
+        XCTAssertEqual(tokens.map { $0.name }, [
+            "CREATE", "WHITESPACE", "TABLE", "WHITESPACE", "IDENTIFIER", "OPENPAREN", "IDENTIFIER", "WHITESPACE", "TYPETEXT", "COMMA", "WHITESPACE", "IDENTIFIER", "WHITESPACE", "TYPETEXT", "CLOSEPAREN", "SEMICOLON"
+        ])
     }
 
     static var allTests = [
-        ("test_Regex_matchedRanges_zeroMatch", test_Regex_matchedRanges_zeroMatch),
-        ("test_Regex_matchedRanges_oneMatch_beginning", test_Regex_matchedRanges_oneMatch_beginning),
-        ("test_Regex_matchedRanges_oneMatch_middle", test_Regex_matchedRanges_oneMatch_middle),
+        ("test_tokenizer_badinput", test_tokenizer_badinput),
+        ("test_tokenizer", test_tokenizer),
     ]
 }
